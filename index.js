@@ -1,8 +1,10 @@
 const inquirer = require("inquirer");
-const fs = require("fs");
+var fs = require('fs'),
+    convertFactory = require('electron-html-to');
 const util = require("util");
 const axios = require("axios");
 const generateHTML = require("./generateHTML");
+const writeFileAsync = util.promisify(fs.writeFile)
 
 const questions = [
           {
@@ -17,9 +19,7 @@ const questions = [
           },
        ]
 
-function promptUser() {
-    return inquirer.prompt(questions)
-}
+
 
 // fs.writeFile doc: fs.writeFile('message.txt', 'Hello Node.js', 'utf8', callback);
 // function writeToFile(fileName, data, res) {
@@ -30,8 +30,9 @@ function promptUser() {
 // }
 
 function init() {
-    promptUser().then(function(dataReturnedFromPrompt){
+  inquirer.prompt(questions).then(function(dataReturnedFromPrompt){
         requestAPI(dataReturnedFromPrompt)
+        // console.log(dataReturnedFromPrompt.color)
     })
 }
 
@@ -42,19 +43,22 @@ function requestAPI(data){
 
     axios.get(queryUrl).then(function(res) {
       console.log(res)
-      console.log(res.data.name)
-      console.log(res.data.location)
-      console.log(res.data.bio)
-      console.log(res.data.public_repos)
+      // console.log(res.data.name)
+      // console.log(res.data.location)
+      // console.log(res.data.bio)
+      // console.log(res.data.public_repos)
+      // console.log(res.data.avatar_url)
+      // console.log('this', data.color)
 
-      generateHTML(res, color)
-        //file name is user name or something
-      //   let fileName = res.x.y.z + ".html"
-      // writeToFile(fileName, res, data)
-      });
 
+      fs.writeFile(`${data.userName}.html`, generateHTML(res, data), function(){
+        console.log("success")
+      })
+});
 }
-// create pdf...??
+init()
+
+// CREATE PDF...??
 // var fs = require('fs'),
 //     convertFactory = require('electron-html-to');
 // var conversion = convertFactory({
@@ -65,4 +69,46 @@ function requestAPI(data){
 //     return console.error(err);
 //   }
 
-init()
+
+            //file name is user name or something
+            //   let fileName = res.x.y.z + ".html"
+            // writeToFile(fileName, res, data)
+
+//IS NOT WRITING HTML
+                  //      .then(function(data) {
+                  //   const html = generateHTML(data);
+
+                  //   return writeFileAsync("index.html", html);
+                  // })
+                  // .then(function() {
+                  //   console.log("Successfully wrote to index.html");
+                  // })
+                  // .catch(function(err) {
+                  //   console.log(err);
+                      
+                  //     });
+
+
+// var conversion = convertFactory({
+//     converterPath: convertFactory.converters.PDF
+//   });
+//   conversion({ html: '<h1>Hello World</h1>' }, function(err, result) {
+//     if (err) {
+//       return console.error(err);
+//     }
+
+
+
+
+//WROTE HTML BUT HAD UNDEFINED
+            // .then(function(data) {
+            //   const html = generateHTML(data);
+
+            //   return writeFileAsync("index.html", html);
+            // })
+            // .then(function() {
+            //   console.log("Successfully wrote to index.html");
+            // })
+            // .catch(function(err) {
+            //   console.log(err);
+            // });
